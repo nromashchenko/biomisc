@@ -14,6 +14,11 @@ def print_stats(input_fasta: str) -> None:
         print("Input file:", input_fasta)
         print(f"Alignment size: {alignment.get_alignment_length()}bp x {len(alignment)}")
 
+        g = sum([x.seq.count('-') for x in alignment])
+        l = sum([len(x.seq) for x in alignment]) 
+        print(f"Gaps: {(g / l * 100):.2f}%")
+
+
 
 def cut_alignment(input_fasta: str, output_file: str, begin: int, end: int) -> None:
     with open(input_fasta) as handle:
