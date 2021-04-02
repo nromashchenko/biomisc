@@ -7,6 +7,24 @@ from Bio import AlignIO
 def cli():
     pass
 
+# https://www.biostars.org/p/326044/
+def column(alignment):
+    '''Generator for getting list of characters in each column in the alignment'''
+    for i in range(alignment.get_alignment_length()):
+        c = []
+
+        for record in alignment:
+            c.append(record.seq[i])
+
+        yield c
+
+def is_gap(base):
+    return base.lower() in ['-', 'n']
+
+def is_invariant(col):
+    filtered = [val for val in col if not is_gap(val)]
+    return len(set(filtered)) < 2
+
 
 def print_stats(input_fasta: str) -> None:
     with open(input_fasta) as handle:
@@ -14,10 +32,12 @@ def print_stats(input_fasta: str) -> None:
         print("Input file:", input_fasta)
         print(f"Alignment size: {alignment.get_alignment_length()}bp x {len(alignment)}")
 
-        g = sum([x.seq.count('-') for x in alignment])
+        g = sum([sum(is_gap(base) for base in x.seq) for x in alignment])
         l = sum([len(x.seq) for x in alignment]) 
         print(f"Gaps: {(g / l * 100):.2f}%")
 
+        invariant = [col for col in column(alignment) if is_invariant(col)]
+        print(f"Invariant sites: {(len(invariant) / alignment.get_alignment_length() * 100):.2f}%")
 
 
 def cut_alignment(input_fasta: str, output_file: str, begin: int, end: int) -> None:
