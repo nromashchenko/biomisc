@@ -1,6 +1,7 @@
 
 import click
 from Bio import AlignIO
+from Bio import SeqIO
 
 
 @click.group()
@@ -80,6 +81,15 @@ def cut(input_fasta: str, output_file: str, begin: int, end: int) -> None:
     Takes the slice [begin:end] of the input alignment and saves it to a file
     """
     cut_alignment(input_fasta, output_file, begin, end)
+
+
+@cli.command()
+@click.argument('input_fasta', type=click.Path(exists=True))
+@click.argument('output_fasta')
+def ungap(input_fasta: str, output_fasta: str) -> None:
+    sequences = [SeqIO.SeqRecord(record.seq.ungap("-"), id=record.id, name=record.name, description=record.description)
+                    for record in SeqIO.parse(input_fasta, "fasta")]
+    SeqIO.write(sequences, output_fasta, "fasta")
 
 
 if __name__ == "__main__":
