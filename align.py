@@ -34,8 +34,10 @@ def print_stats(input_fasta: str) -> None:
         print(f"Alignment size: {alignment.get_alignment_length()}bp x {len(alignment)}")
 
         g = sum([sum(is_gap(base) for base in x.seq) for x in alignment])
-        l = sum([len(x.seq) for x in alignment]) 
+        l = sum([len(x.seq) for x in alignment])
+        
         print(f"Gaps: {(g / l * 100):.2f}%")
+        print(f"Mean alignment length (no gaps): {(l - g) / len(alignment)}")
 
         invariant = [col for col in column(alignment) if is_invariant(col)]
         print(f"Invariant sites: {(len(invariant) / alignment.get_alignment_length() * 100):.2f}%")

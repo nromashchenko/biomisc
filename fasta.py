@@ -1,5 +1,5 @@
-
 import click
+import gzip
 import numpy as np
 from Bio import SeqIO
 
@@ -10,11 +10,14 @@ def cli():
 
 
 def print_stats(input_fasta: str) -> None:
-    with open(input_fasta) as handle:
+    with gzip.open(input_fasta, "rt") if input_fasta.endswith('.gz') else open(input_fasta) as handle:
         count = 0
         avg = 0
         min = np.Inf
+        min_name = None
         max = np.NINF
+        max_name = None
+
         for rec in SeqIO.parse(handle, "fasta"):
             l = len(rec)
             count += 1
@@ -22,14 +25,16 @@ def print_stats(input_fasta: str) -> None:
             
             if l > max:
                 max = l
+                max_name = rec.id
             if l < min:
                 min = l
+                min_name = rec.id
 
         avg /= count
 
         print(f"Num sequences: {count}")
-        print(f"Min length: {min}")
-        print(f"Max length: {max}")
+        print(f"Min length: {min} {min_name}")
+        print(f"Max length: {max} {max_name}")
         print(f"Avg length: {avg}")
             
 
